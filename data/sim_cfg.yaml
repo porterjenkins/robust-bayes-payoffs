@@ -1,0 +1,30 @@
+global:
+  name: test-sim
+  data_dir: /Users/porterjenkins/code/robust-bayes-payoffs/data
+stores:
+  store_1:
+    segment: 0
+    n_samples: 100
+    products:
+      coca_cola_20oz:
+        mu: 1.0
+        alpha: 5.0
+      diet_coke_20_oz:
+        mu: 2.0
+        alpha: 4.0
+      dasani_20_oz:
+        mu: 0.5
+        alpha: 2.0
+  store_2:
+    segment: 0
+    n_samples: 100
+    products:
+      coca_cola_20oz:
+        mu: 1.0
+        alpha: 5.0
+      diet_coke_20_oz:
+        mu: 2.0
+        alpha: 4.0
+      dasani_20_oz:
+        mu: 0.5
+        alpha: 2.0
