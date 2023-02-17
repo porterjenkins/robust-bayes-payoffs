@@ -91,8 +91,6 @@ class SalesDataGenerator(object):
             "sales": []
         }
 
-
-
         for s in self.stores:
             size = s.n_samples
             for p in s.products:
