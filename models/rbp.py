@@ -28,7 +28,7 @@ class RBPModelBase(object):
 
 
 
-class RBPHierachicalSplit(RBPModelBase):
+class RBPHierachicalProductSegment(RBPModelBase):
 
     """
     Robust Bayesian Payoff estimates for split sim. Input sim is expected to be filtered to a single product,
@@ -36,7 +36,7 @@ class RBPHierachicalSplit(RBPModelBase):
     """
 
     def __init__(self):
-        super(RBPHierachicalSplit, self).__init__()
+        super(RBPHierachicalProductSegment, self).__init__()
 
     def build(self, ):
 
@@ -54,7 +54,7 @@ class RBPHierachicalSplit(RBPModelBase):
             y = pm.NegativeBinomial("y", mu=mu[stores], alpha=alpha, observed=payoff, dims="obs_id")
 
 
-class RBPHierachicalJoint(RBPModelBase):
+class RBPHierachicalProduct(RBPModelBase):
 
     """
     Robust Bayesian Payoff estimates for joint sim. Input sim is expected to be filtered to a single product,
@@ -62,4 +62,4 @@ class RBPHierachicalJoint(RBPModelBase):
     """
 
     def __init__(self):
-        super(RBPHierachicalJoint, self).__init__()
+        super(RBPHierachicalProduct, self).__init__()
