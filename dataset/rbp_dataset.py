@@ -7,9 +7,12 @@ class RBPBaseDataset(object):
     payoff_key = "sales"
     store_key = "store"
 
-    def __init__(self, data):
+    def __init__(self, group: str,  data: pd.DataFrame):
+        self.group = group
         self.data = data
 
+    def __str__(self):
+        return self.group
     @classmethod
     def split(cls, df: pd.DataFrame):
         # implemented by derived class
@@ -42,8 +45,8 @@ class RBPBaseDataset(object):
 
 class RBPProductDataset(RBPBaseDataset):
 
-    def __init__(self, data):
-        super(RBPProductDataset, self).__init__(data)
+    def __init__(self, group, data):
+        super(RBPProductDataset, self).__init__(group, data)
 
     @classmethod
     def split(cls, df: pd.DataFrame):
@@ -54,7 +57,7 @@ class RBPProductDataset(RBPBaseDataset):
         """
         datasets = []
         for k, dta in df.groupby(cls.product_key):
-            rbf_dta = RBPProductDataset(dta)
+            rbf_dta = RBPProductDataset(",".join(k), dta)
             datasets.append(rbf_dta)
 
         return datasets
@@ -62,9 +65,8 @@ class RBPProductDataset(RBPBaseDataset):
 
 class RBPProductSegmentDataset(RBPBaseDataset):
 
-    def __init__(self, data):
-        super(RBPProductSegmentDataset, self).__init__(data)
-
+    def __init__(self, group, data):
+        super(RBPProductSegmentDataset, self).__init__(group, data)
 
     @classmethod
     def split(cls, df: pd.DataFrame):
@@ -75,7 +77,9 @@ class RBPProductSegmentDataset(RBPBaseDataset):
         """
         datasets = []
         for k, dta in df.groupby([cls.segment_key, cls.product_key]):
-            rbf_dta = RBPProductSegmentDataset(dta)
+            g = [str(x) for x in k]
+            g = ",".join(g)
+            rbf_dta = RBPProductSegmentDataset(group=g, data=dta)
             datasets.append(rbf_dta)
 
         return datasets
