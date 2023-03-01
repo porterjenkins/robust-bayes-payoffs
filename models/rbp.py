@@ -31,7 +31,7 @@ class RBPModelBase(object):
 class RBPHierachicalProductSegment(RBPModelBase):
 
     """
-    Robust Bayesian Payoff estimates for split sim. Input sim is expected to be filtered to a single product,
+    Robust Bayesian Payoff estimates for data split across segments. Input data is expected to be filtered to a single product,
         segment pair
     """
 
@@ -57,7 +57,7 @@ class RBPHierachicalProductSegment(RBPModelBase):
 class RBPHierachicalProduct(RBPModelBase):
 
     """
-    Robust Bayesian Payoff estimates for joint sim. Input sim is expected to be filtered to a single product,
+    Robust Bayesian Payoff estimates for joint data. Input data is expected to be filtered to a single product,
         across multiple segments
     """
 
