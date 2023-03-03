@@ -1,7 +1,10 @@
 import pymc as pm
 import arviz as az
+import yaml
 
 from dataset.rbp_dataset import RBPBaseDataset
+
+
 
 class RBPModelBase(object):
 
@@ -9,13 +12,19 @@ class RBPModelBase(object):
     # define variables in terms of level, loc and scale
     vars = {}
 
-    def __init__(self, n_samples: int = 1000, n_tune: int = 1000):
-        self.n = n_samples
-        self.tune = n_tune
+    def __init__(self, cfg: str):
+        cfg = self._read_yaml(cfg)
+        self.prior = cfg["prior"]
+        self.n = cfg["train"]["n_samples"]
+        self.tune = cfg["train"]["n_tune"]
         self.model = None
         self.samples = None
         self.idata = None
 
+    def _read_yaml(self, fpath):
+        with open(fpath, "r") as f:
+            cfg = yaml.safe_load(f)
+        return cfg
     def build(self, dataset: RBPBaseDataset):
         # implemented by derived class
         pass
@@ -49,10 +58,6 @@ class RBPModelBase(object):
         az.plot_posterior(self.idata, show=True)
 
 
-
-
-
-
 class RBPHierachicalProductSegment(RBPModelBase):
 
     """
@@ -72,8 +77,8 @@ class RBPHierachicalProductSegment(RBPModelBase):
         lower_scale
     ]
 
-    def __init__(self):
-        super(RBPHierachicalProductSegment, self).__init__()
+    def __init__(self, cfg):
+        super(RBPHierachicalProductSegment, self).__init__(cfg)
 
     def build(self, dataset: RBPBaseDataset):
         """
@@ -90,11 +95,14 @@ class RBPHierachicalProductSegment(RBPModelBase):
             # global priors
             mu_global = pm.TruncatedNormal(
                 self.global_loc,
-                mu=1.0,
-                sigma=5.0,
+                mu=self.prior[self.global_loc]['mu'],
+                sigma=self.prior[self.global_loc]['sigma'],
                 lower=0.0
             )
-            sig = pm.Exponential(self.global_scale, 5.0)
+            sig = pm.Exponential(
+                self.global_scale,
+                lam=self.prior[self.global_scale]['lam']
+            )
 
             # lower priors
             mu = pm.TruncatedNormal(
@@ -104,7 +112,11 @@ class RBPHierachicalProductSegment(RBPModelBase):
                 lower=0.0,
                 dims="store"
             )
-            alpha = pm.Gamma(self.lower_scale, 4.0, 4.0)
+            alpha = pm.Gamma(
+                self.lower_scale,
+                alpha=self.prior[self.lower_scale]["alpha"],
+                beta=self.prior[self.lower_scale]["beta"]
+            )
 
             y = pm.NegativeBinomial(
                 self.payoff_name,
