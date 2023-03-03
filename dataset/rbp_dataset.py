@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
 
 class RBPBaseDataset(object):
 
@@ -13,6 +15,18 @@ class RBPBaseDataset(object):
 
     def __str__(self):
         return self.group
+
+    def get_coords(self):
+        """
+        Retrieve PyMC coords construct: Details dimensionality of groups
+        :return: (dict)
+        """
+        # implemented by derived class
+        pass
+
+    def get_payoff(self):
+        return self.data[self.payoff_key].values
+
     @classmethod
     def split(cls, df: pd.DataFrame):
         # implemented by derived class
@@ -45,8 +59,52 @@ class RBPBaseDataset(object):
 
 class RBPProductDataset(RBPBaseDataset):
 
+    """
+    Robust Bayesian Payoff dataset for data combined across segments. Data are filtered to a single product,
+        across multiple segments
+    """
+
     def __init__(self, group, data):
         super(RBPProductDataset, self).__init__(group, data)
+
+    def get_coords(self):
+        """
+        Retrieve PyMC coords construct: Details dimensionality of groups
+        :return: Tuple(dict, dict): index dictionary, coords dictionary
+        """
+
+        """
+        coords = {
+            #'product': prod_names,
+            'store': store_names,
+            'segment': seg_names
+        }
+        """
+
+        # get store indices
+        le = LabelEncoder()
+        store_idx = le.fit_transform(self.data[self.store_key].values)
+        store_names = le.classes_
+
+        # get segment indices
+        seg_idx = self.data[self.segment_key].values
+        seg_names =self.data[self.segment_key].unique()
+
+        # store to segment
+        store_to_seg = self.data[[self.store_key, self.segment_key]].groupby(self.store_key).max()['segment'].values
+
+        idx = {
+            "store": store_idx,
+            "segment": seg_idx,
+            "store_to_seg": store_to_seg
+        }
+
+        coords = {
+            "store": store_names,
+            "segment": seg_names
+        }
+
+        return idx, coords
 
     @classmethod
     def split(cls, df: pd.DataFrame):
@@ -57,7 +115,7 @@ class RBPProductDataset(RBPBaseDataset):
         """
         datasets = []
         for k, dta in df.groupby(cls.product_key):
-            rbf_dta = RBPProductDataset(",".join(k), dta)
+            rbf_dta = RBPProductDataset(k, dta)
             datasets.append(rbf_dta)
 
         return datasets
@@ -65,8 +123,29 @@ class RBPProductDataset(RBPBaseDataset):
 
 class RBPProductSegmentDataset(RBPBaseDataset):
 
+    """
+    Robust Bayesian Payoff dataset split across segments. Data are filtered to a single product,
+        segment pair
+    """
+
     def __init__(self, group, data):
         super(RBPProductSegmentDataset, self).__init__(group, data)
+
+    def get_coords(self):
+        """
+        Retrieve PyMC coords construct: Details dimensionality of groups
+        :return: (dict)
+        """
+        # get store indices
+        le = LabelEncoder()
+        store_idx = le.fit_transform(self.data['store'].values)
+        store_names = le.classes_
+
+        idx = {"store": store_idx}
+        coords = {"store": store_names}
+
+        return idx, coords
+
 
     @classmethod
     def split(cls, df: pd.DataFrame):

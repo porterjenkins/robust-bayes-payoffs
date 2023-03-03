@@ -37,7 +37,10 @@ class SimCfg(object):
         return dta
 
     def get_ground_truth_by_seg(self):
-        return self.df.groupby(["product","segment"]).mean()
+        return self.df.groupby(["product","segment"]).mean(numeric_only=True)
 
     def get_ground_truth_by_store(self):
-        return self.df.groupby(["product","store"]).mean()
+        return self.df.groupby(["product","store"]).mean(numeric_only=True)
+
+    def get_ground_truth_by_seg_store(self):
+        return self.df.groupby(["product","segment", "store"]).mean(numeric_only=True)
