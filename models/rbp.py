@@ -26,8 +26,8 @@ class RBPModelBase(object):
             self.idata = pm.sample(draws=self.n, tune=self.tune)
 
         self.samples = {}
-        for k, v in self.vars.items():
-            self.samples[v] = self.idata["posterior"][v].values
+        for rv in self.vars:
+            self.samples[rv] = self.idata["posterior"][rv].values
 
 
     def _get_vars(self, model: pm.Model):
@@ -60,21 +60,24 @@ class RBPHierachicalProductSegment(RBPModelBase):
         segment pair
     """
 
-    vars = {
-        "global_loc": "mu_segment",
-        "global_scale": "sigma",
-        "lower_loc": "mu_store",
-        "lower_scale": "alpha_store"
-    }
+    global_loc = "mu_segment"
+    global_scale = "sigma"
+    lower_loc = "mu_store"
+    lower_scale = "alpha_store"
+
+    vars = [
+        global_loc,
+        global_scale,
+        lower_loc,
+        lower_scale
+    ]
 
     def __init__(self):
         super(RBPHierachicalProductSegment, self).__init__()
 
-    def build(self, dataset: RBPBaseDataset, cfg: str):
+    def build(self, dataset: RBPBaseDataset):
         """
-
         :param dataset: (RBPBaseDataset) Input dataset
-        :param cfg: (str) Path to yaml cfg
         :return:
         """
 
@@ -86,22 +89,22 @@ class RBPHierachicalProductSegment(RBPModelBase):
 
             # global priors
             mu_global = pm.TruncatedNormal(
-                self.vars['global_loc'],
+                self.global_loc,
                 mu=1.0,
                 sigma=5.0,
                 lower=0.0
             )
-            sig = pm.Exponential(self.vars['global_scale'], 5.0)
+            sig = pm.Exponential(self.global_scale, 5.0)
 
             # lower priors
             mu = pm.TruncatedNormal(
-                self.vars['lower_loc'],
+                self.lower_loc,
                 mu=mu_global,
                 sigma=sig,
                 lower=0.0,
                 dims="store"
             )
-            alpha = pm.Gamma(self.vars["lower_scale"], 4.0, 4.0)
+            alpha = pm.Gamma(self.lower_scale, 4.0, 4.0)
 
             y = pm.NegativeBinomial(
                 self.payoff_name,
