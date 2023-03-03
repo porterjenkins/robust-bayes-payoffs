@@ -6,13 +6,14 @@ from dataset.rbp_dataset import RBPBaseDataset
 class RBPModelBase(object):
 
     payoff_name = "payoff"
+    # define variables in terms of level, loc and scale
+    vars = {}
 
     def __init__(self, n_samples: int = 1000, n_tune: int = 1000):
         self.n = n_samples
         self.tune = n_tune
         self.model = None
         self.samples = None
-        self.vars = None
         self.idata = None
 
     def build(self, dataset: RBPBaseDataset):
@@ -25,9 +26,7 @@ class RBPModelBase(object):
             self.idata = pm.sample(draws=self.n, tune=self.tune)
 
         self.samples = {}
-        for v in self.vars:
-            if v == self.payoff_name:
-                continue
+        for k, v in self.vars.items():
             self.samples[v] = self.idata["posterior"][v].values
 
 
@@ -61,11 +60,23 @@ class RBPHierachicalProductSegment(RBPModelBase):
         segment pair
     """
 
+    vars = {
+        "global_loc": "mu_segment",
+        "global_scale": "sigma",
+        "lower_loc": "mu_store",
+        "lower_scale": "alpha_store"
+    }
 
     def __init__(self):
         super(RBPHierachicalProductSegment, self).__init__()
 
-    def build(self, dataset: RBPBaseDataset):
+    def build(self, dataset: RBPBaseDataset, cfg: str):
+        """
+
+        :param dataset: (RBPBaseDataset) Input dataset
+        :param cfg: (str) Path to yaml cfg
+        :return:
+        """
 
         idx, coords = dataset.get_coords()
         payoff = dataset.get_payoff()
@@ -73,18 +84,34 @@ class RBPHierachicalProductSegment(RBPModelBase):
         with pm.Model(coords=coords) as model:
             stores = pm.MutableData("store_idx", idx["store"], dims="obs_id")
 
-            # global
-            mu_global = pm.TruncatedNormal("mu_global", mu=1.0, sigma=5.0, lower=0.0)
-            sig = pm.Exponential("sigma", 5.0)
+            # global priors
+            mu_global = pm.TruncatedNormal(
+                self.vars['global_loc'],
+                mu=1.0,
+                sigma=5.0,
+                lower=0.0
+            )
+            sig = pm.Exponential(self.vars['global_scale'], 5.0)
 
-            # priors
-            mu = pm.TruncatedNormal("mu_store", mu=mu_global, sigma=sig, lower=0.0, dims="store")
-            alpha = pm.Gamma("alpha", 4.0, 4.0)
+            # lower priors
+            mu = pm.TruncatedNormal(
+                self.vars['lower_loc'],
+                mu=mu_global,
+                sigma=sig,
+                lower=0.0,
+                dims="store"
+            )
+            alpha = pm.Gamma(self.vars["lower_scale"], 4.0, 4.0)
 
-            y = pm.NegativeBinomial(self.payoff_name, mu=mu[stores], alpha=alpha, observed=payoff, dims="obs_id")
+            y = pm.NegativeBinomial(
+                self.payoff_name,
+                mu=mu[stores],
+                alpha=alpha,
+                observed=payoff,
+                dims="obs_id"
+            )
 
         self.model = model
-        self.vars = self._get_vars(self.model)
 
 
 class RBPHierachicalProduct(RBPModelBase):
