@@ -52,7 +52,7 @@ class RBPModelBase(object):
 
     def viz_graph(self):
         # implemented by derived class
-        pass
+        pm.model_to_graphviz(self.model)
 
     def plot(self):
         az.plot_posterior(self.idata, show=True)
@@ -88,6 +88,11 @@ class RBPHierachicalProductSegment(RBPModelBase):
 
         idx, coords = dataset.get_coords()
         payoff = dataset.get_payoff()
+        feats, names = dataset.get_features()
+
+        # TODO: enable m features. this assumes a single feature in 0th positio
+        x_facings = feats[names[0]].values
+
 
         with pm.Model(coords=coords) as model:
             stores = pm.MutableData("store_idx", idx["store"], dims="obs_id")
@@ -118,9 +123,11 @@ class RBPHierachicalProductSegment(RBPModelBase):
                 beta=self.prior[self.lower_scale]["beta"]
             )
 
+            e_y = x_facings*mu[stores]
+
             y = pm.NegativeBinomial(
                 self.payoff_name,
-                mu=mu[stores],
+                mu=e_y,
                 alpha=alpha,
                 observed=payoff,
                 dims="obs_id"

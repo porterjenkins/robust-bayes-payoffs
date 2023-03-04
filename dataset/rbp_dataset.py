@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-import numpy as np
+
 
 class RBPBaseDataset(object):
 
@@ -8,6 +8,11 @@ class RBPBaseDataset(object):
     segment_key = "segment"
     payoff_key = "sales"
     store_key = "store"
+    facings_key = "facings"
+
+    features = [
+        facings_key
+    ]
 
     def __init__(self, group: str,  data: pd.DataFrame):
         self.group = group
@@ -26,6 +31,12 @@ class RBPBaseDataset(object):
 
     def get_payoff(self):
         return self.data[self.payoff_key].values
+    def get_features(self):
+        """
+
+        :return: Tuple(pd.Dataframe, list) returns a data frame and a list of features
+        """
+        return self.data[self.features], self.features
 
     @classmethod
     def split(cls, df: pd.DataFrame):

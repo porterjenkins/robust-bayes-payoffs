@@ -8,9 +8,9 @@ import numpy as np
 
 class NegBinomProduct(object):
 
-    def __init__(self, name: str, mu: float, alpha: float):
+    def __init__(self, name: str, theta: float, alpha: float):
         self.name = name
-        self.mu = mu
+        self.theta = theta
         self.alpha = alpha
 
     @staticmethod
@@ -19,10 +19,11 @@ class NegBinomProduct(object):
         p = alpha / (mu + alpha)
         return n, p
 
-    def gen(self, size: int):
-        n, p = self.change_params(self.mu, self.alpha)
-        x = np.random.negative_binomial(n, p, size)
-        return x
+    def gen(self, size: int, x: np.ndarray):
+        mu = self.theta * x
+        n, p = self.change_params(mu, self.alpha)
+        y = np.random.negative_binomial(n, p, size)
+        return y
 
 class Store(object):
     def __init__(self, segment: int, name: str, n_samples: int, products: List[NegBinomProduct]):
@@ -59,7 +60,7 @@ class SalesDataGenerator(object):
                 products.append(
                     NegBinomProduct(
                         name=p,
-                        mu=p_data['mu'],
+                        theta=p_data['mu'],
                         alpha=p_data['alpha']
                     )
                 )
@@ -88,19 +89,22 @@ class SalesDataGenerator(object):
             "segment": [],
             "product": [],
             "time": [],
-            "sales": []
+            "sales": [],
+            "facings": []
         }
 
         for s in self.stores:
             size = s.n_samples
             for p in s.products:
-                x = p.gen(size=size)
+                x = np.random.randint(1, 5, size=size)
+                y = p.gen(size=size, x=x)
 
-                output['sales'] += x.tolist()
+                output['sales'] += y.tolist()
                 output['product'] += [p.name]*size
                 output['store'] += [s.name]*size
                 output['segment'] += [s.segment]*size
                 output['time'] += list(range(size))
+                output['facings'] += x.tolist()
 
         output = pd.DataFrame(output)
         output.to_csv(self.fpath, index=False)

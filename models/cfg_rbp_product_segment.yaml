@@ -8,8 +8,8 @@ prior:
     sigma: 5.0
   sigma:
     distribution: Exponential
-    lam: 5.0
+    lam: 0.5
   alpha_store:
     distribution: Gamma
-    alpha: 4.0
-    beta: 4.0
+    alpha: 1.0
+    beta: 0.5
