@@ -104,10 +104,14 @@ class RBPHierachicalProductSegment(RBPModelBase):
                 sigma=self.prior[self.global_loc]['sigma'],
                 lower=0.0
             )
-            sig = pm.Exponential(
+
+            sig = pm.TruncatedNormal(
                 self.global_scale,
-                lam=self.prior[self.global_scale]['lam']
+                mu=self.prior[self.global_scale]['mu'],
+                sigma=self.prior[self.global_scale]['sigma'],
+                lower=0.0
             )
+
 
             # lower priors
             mu = pm.TruncatedNormal(
@@ -117,10 +121,10 @@ class RBPHierachicalProductSegment(RBPModelBase):
                 lower=0.0,
                 dims="store"
             )
-            alpha = pm.Gamma(
+
+            alpha = pm.Exponential(
                 self.lower_scale,
-                alpha=self.prior[self.lower_scale]["alpha"],
-                beta=self.prior[self.lower_scale]["beta"]
+                lam=self.prior[self.lower_scale]['lam']
             )
 
             e_y = x_facings*mu[stores]

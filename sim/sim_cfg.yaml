@@ -4,7 +4,7 @@ global:
 stores:
   store_1:
     segment: 0
-    n_samples: 2000
+    n_samples: 1000
     products:
       coca_cola_20oz:
         mu: 0.5
@@ -17,7 +17,7 @@ stores:
         alpha: 0.5
   store_2:
     segment: 0
-    n_samples: 2000
+    n_samples: 1000
     products:
       coca_cola_20oz:
         mu: 1.0
@@ -30,7 +30,7 @@ stores:
         alpha: 0.5
   store_3:
     segment: 1
-    n_samples: 2000
+    n_samples: 1000
     products:
       coca_cola_20oz:
         mu: 4.0
@@ -43,7 +43,7 @@ stores:
         alpha: 0.5
   store_4:
     segment: 1
-    n_samples: 2000
+    n_samples: 1000
     products:
       coca_cola_20oz:
         mu: 3.0

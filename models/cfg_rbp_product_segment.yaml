@@ -4,12 +4,12 @@ train:
 prior:
   mu_segment:
     distribution: TruncatedNormal
-    mu: 1.0
-    sigma: 5.0
+    mu: 0.0
+    sigma: 3.0
   sigma:
+    distribution: TruncatedNormal
+    mu: 0.0
+    sigma: 1.0
+  alpha_store:
     distribution: Exponential
     lam: 0.5
-  alpha_store:
-    distribution: Gamma
-    alpha: 1.0
-    beta: 0.5

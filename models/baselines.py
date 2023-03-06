@@ -38,7 +38,7 @@ class NaiveEPFBaseline(RBPModelBase):
         df['y'] = df[self.dta.payoff_key] / df[self.dta.facings_key]
         self.samples = {
             self.global_loc: df['y'].mean(),
-            self.lower_loc: df[['store', 'y']].groupby("store").mean().values.reshape((1, 1, -1))
+            self.lower_loc: df[['store', 'y']].groupby("store").mean().values.reshape((1, 1, -1)),
             self.global_scale: -1,
             self.lower_scale: -1
         }
