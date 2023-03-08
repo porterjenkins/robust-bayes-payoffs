@@ -5,7 +5,7 @@ prior:
   mu_segment:
     distribution: TruncatedNormal
     mu: 0.0
-    sigma: 3.0
+    sigma: 2.0
   sigma:
     distribution: TruncatedNormal
     mu: 0.0
