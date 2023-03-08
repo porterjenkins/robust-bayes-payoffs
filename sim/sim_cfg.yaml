@@ -1,7 +1,7 @@
 global:
   name: test-sim
   data_dir: /Users/porterjenkins/code/robust-bayes-payoffs/sim
-  eps: 0.6
+  eps: 0.1
 stores:
   store_1:
     segment: 0

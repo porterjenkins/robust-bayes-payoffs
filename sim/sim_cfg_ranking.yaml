@@ -1,0 +1,62 @@
+global:
+  name: exp:uncertainty-ranking
+  data_dir: /Users/porterjenkins/code/robust-bayes-payoffs/sim
+  eps: 0.0
+stores:
+  store_1:
+    segment: 0
+    n_samples: 2
+    products:
+      coca_cola_20oz:
+        mu: 1.0
+        alpha: 1.0
+  store_2:
+    segment: 0
+    n_samples: 4
+    products:
+      monster_ultra_16oz:
+        mu: 1.0
+        alpha: 1.0
+  store_3:
+    segment: 0
+    n_samples: 8
+    products:
+      monster_16_oz:
+        mu: 1.0
+        alpha: 1.0
+  store_4:
+    segment: 0
+    n_samples: 16
+    products:
+      sprite_20_oz:
+        mu: 1.0
+        alpha: 1.0
+  store_5:
+    segment: 0
+    n_samples: 32
+    products:
+      dasani_20_oz:
+        mu: 1.0
+        alpha: 1.0
+  store_6:
+    segment: 0
+    n_samples: 64
+    products:
+      diet_coke_20_oz:
+        mu: 1.0
+        alpha: 1.0
+  store_7:
+    segment: 0
+    n_samples: 128
+    products:
+      monster_ultra_watermelon_16oz:
+        mu: 1.0
+        alpha: 1.0
+  store_8:
+    segment: 0
+    n_samples: 256
+    products:
+      reign_orange_16oz:
+        mu: 1.0
+        alpha: 1.0
+
