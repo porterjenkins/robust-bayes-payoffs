@@ -1,5 +1,5 @@
 .idea
-.csv
+*.csv
 *.ipynb
 *ipynb_checkpoints
 .DS_Store

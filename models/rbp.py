@@ -52,7 +52,7 @@ class RBPModelBase(object):
 
     def viz_graph(self):
         # implemented by derived class
-        pm.model_to_graphviz(self.model)
+        return pm.model_to_graphviz(self.model)
 
     def plot(self):
         az.plot_posterior(self.idata, show=True)
