@@ -17,6 +17,8 @@ class RBPModelBase(object):
         self.prior = cfg["prior"]
         self.n = cfg["train"]["n_samples"]
         self.tune = cfg["train"]["n_tune"]
+        # uncertainty penalty (mu - lambda*sigma)
+        self.lam = cfg['ranking']["lambda"]
         self.model = None
         self.samples = None
         self.idata = None
@@ -79,6 +81,26 @@ class RBPHierachicalProductSegment(RBPModelBase):
 
     def __init__(self, cfg):
         super(RBPHierachicalProductSegment, self).__init__(cfg)
+
+    def predict(self):
+        if self.samples is not None:
+            return self.samples[self.lower_loc].flatten()
+        else:
+            raise Exception("Calling predict() before fit() is not implemented.")
+
+    def get_ranking_stat(self):
+        """
+        Calculate uncertainty-penalized Expected Payoff per Facing (EPF)
+        :param lam: lambda parameter, which determines strength of uncertainty penalty
+        :return: (float) EPF score
+        """
+        posterior = self.predict()
+        mu = posterior.mean()
+        sig = posterior.std()
+
+        epf = mu - self.lam*sig
+
+        return epf
 
     def build(self, dataset: RBPBaseDataset):
         """

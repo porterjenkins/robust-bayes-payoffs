@@ -25,7 +25,8 @@ class NaiveEPFBaseline(RBPModelBase):
             "train": {
                 "n_samples": -1,
                 "n_tune": -1
-            }
+            },
+            "ranking": {"lambda":-1}
 
         }
         return cfg
@@ -45,7 +46,10 @@ class NaiveEPFBaseline(RBPModelBase):
 
 
     def predict(self):
-        pass
+        return self.samples[self.global_loc]
+
+    def get_ranking_stat(self):
+        return self.predict()
 
     def viz_graph(self):
         pass
