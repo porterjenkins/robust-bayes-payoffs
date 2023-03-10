@@ -10,7 +10,7 @@ prior:
     distribution: TruncatedNormal
     mu: 0.0
     sigma: 1.0
-  alpha_store:
+  payoff_sig2:
     distribution: Exponential
     lam: 0.5
 ranking:

@@ -70,7 +70,7 @@ class RBPHierachicalProductSegment(RBPModelBase):
     global_loc = "mu_segment"
     global_scale = "sigma"
     lower_loc = "mu_store"
-    lower_scale = "alpha_store"
+    lower_scale = "payoff_sig2"
 
     vars = [
         global_loc,
@@ -144,17 +144,17 @@ class RBPHierachicalProductSegment(RBPModelBase):
                 dims="store"
             )
 
-            alpha = pm.Exponential(
+            payoff_sig2 = pm.Exponential(
                 self.lower_scale,
                 lam=self.prior[self.lower_scale]['lam']
             )
 
             e_y = x_facings*mu[stores]
 
-            y = pm.NegativeBinomial(
+            y = pm.Gamma(
                 self.payoff_name,
                 mu=e_y,
-                alpha=alpha,
+                sigma=payoff_sig2,
                 observed=payoff,
                 dims="obs_id"
             )
