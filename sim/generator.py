@@ -6,24 +6,59 @@ import pandas as pd
 import yaml
 import numpy as np
 
+import matplotlib.pyplot as plt
 
-class NegBinomProduct(object):
 
-    def __init__(self, name: str, theta: float, alpha: float):
+class GammaProduct(object):
+
+    def __init__(self, name: str, theta: float, scale: float):
         self.name = name
         self.theta = theta
-        self.alpha = alpha
+        self.scale = scale
+
 
     @staticmethod
-    def change_params(mu, alpha):
-        n = alpha
-        p = alpha / (mu + alpha)
-        return n, p
+    def change_params(mu, sig2):
+        """
+        Link function from mu sigma to shape, scale
+        :param mu: mean
+        :param sig2: variance (sigma^2)
+        :return:
+        """
+        shape = mu ** 2 / sig2
+        rate = mu / sig2
+        scale = 1/rate
+        return shape, rate, scale
+
+    @staticmethod
+    def get_shape_from_mean_scale(mu, scale):
+        """
+            mean: mu
+            scale: 1/beta
+
+            sig2 = scale*mu
+            shape = mu^2/sig2
+
+        :param mu: float
+        :param scale: float
+        :return: alpha, sig2
+        """
+
+        sig2 = scale*mu
+        shape = mu**2/sig2
+        return shape, sig2
 
     def gen(self, size: int, x: np.ndarray):
-        mu = self.theta * x
-        n, p = self.change_params(mu, self.alpha)
-        y = np.random.negative_binomial(n, p, size)
+        mu_vec = self.theta * x
+        #shape, rate, scale = self.change_params(mu_vec, sig2)
+        shape, sig2 = self.get_shape_from_mean_scale(mu_vec, self.scale)
+        y = np.random.gamma(shape, self.scale, size)
+        plt.hist(y, bins=30)
+        #plt.title(f"mu:{self.theta}, sig2:{sig2}")
+        plt.title(f"mu:{self.theta}")
+        plt.show()
+        plt.clf()
+        plt.close()
         return y
 
 class OutlierSales(object):
@@ -38,7 +73,7 @@ class OutlierSales(object):
         return y
 
 class Store(object):
-    def __init__(self, segment: int, name: str, n_samples: int, products: List[NegBinomProduct]):
+    def __init__(self, segment: int, name: str, n_samples: int, products: List[GammaProduct]):
         self.segment = segment
         self.name = name
         self.n_samples = n_samples
@@ -71,10 +106,10 @@ class SalesDataGenerator(object):
             products = []
             for p, p_data in vals['products'].items():
                 products.append(
-                    NegBinomProduct(
+                    GammaProduct(
                         name=p,
-                        theta=p_data['mu'],
-                        alpha=p_data['alpha']
+                        theta=p_data['theta'],
+                        scale=p_data['scale']
                     )
                 )
 
